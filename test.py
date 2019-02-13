@@ -1,19 +1,19 @@
-from autog.env_setup import Enviromet
+from autog.env_setup import Environment
 import cv2
 import numpy as np 
 from PIL import ImageGrab
 
 
-env = Enviromet()
+env = Environment()
 
 env.set_top_left()
 
 env.set_bottom_right()
 
 
+
+
 screen = np.array(ImageGrab.grab(bbox=(env.left , env.top, env.right, env.bottom)))
-
-
 while True:
     cv2.imshow("Screen", screen)
 

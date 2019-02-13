@@ -11,9 +11,9 @@ def click(event,x,y,flags,param):
         points = (x, y)
         
 
-class Enviromet:
+class Environment:
     """
-    Get the enviromet ready for training
+    Get the Environment ready for training
     """
     def __init__(self):
         self.posible_actions = None
@@ -23,6 +23,9 @@ class Enviromet:
         self.left = None
 
     def set_top_left(self):
+    """
+    Get the top left corner of screenshot
+    """
         global points
         cv2.namedWindow("frame")
         cv2.setMouseCallback("frame", click)
@@ -38,6 +41,9 @@ class Enviromet:
         self.left , self.top= points[0]*4, points[1]*4
 
     def set_bottom_right(self):
+    """
+    Get the bottom left corner of the screenshot
+    """
         global points
         cv2.namedWindow("frame")
         cv2.setMouseCallback("frame", click)
