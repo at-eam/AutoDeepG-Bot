@@ -12,15 +12,35 @@ def click(event,x,y,flags,param):
     global points
     if event == cv2.EVENT_LBUTTONDOWN:
         points = (x, y)
-        
+
+
 
 class Environment:
+
+    def set_top_left():
+        raise NotImplementedError
+    def set_bottom_right():
+        raise NotImplementedError
+    def start_recording():
+        raise NotImplementedError
+    def save_memory():
+        raise NotImplementedError
+    def load_memory():
+        raise NotImplementedError
+    def memory():
+        raise NotImplementedError
+    def play():
+        raise NotImplementedError
+
+
+class Mouse_Control_Env(Environment):
     def __init__(self, 
     mouse_control = False,
     keyboard_control = False, 
     max_memory = 10000):
         """ 
-        Get the Environment ready for training 
+        Get the Environment ready for training for
+        environments controled with only mouse
 
         Params:
         ======

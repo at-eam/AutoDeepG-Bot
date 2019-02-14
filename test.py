@@ -1,11 +1,10 @@
-from autog.env_setup import Environment
+from autog.env_setup import Mouse_Control_Env
 from autog.train_pytorch import train_mouse
 import cv2
 import torch
 import numpy as np 
 from torch import nn, optim
 import torch.nn.functional as F
-from PIL import ImageGrab
 
 class Net(nn.Module):
     def __init__(self):
@@ -15,19 +14,20 @@ class Net(nn.Module):
         self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
         self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(64 * 10 * 10, 500)
-        self.fc2 = nn.Linear(500, 2)
+        self.fc2 = nn.Linear(500,500)
+        self.fc3 = nn.Linear(500, 2)
 
     def forward(self, x):
-        # add sequence of convolutional and max pooling layers
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = self.pool(F.relu(self.conv3(x)))
         x = x.view(-1, 64 * 10 * 10)
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
         return x
 
-env = Environment(mouse_control=True)
+env = Mouse_Control_Env(mouse_control=True)
 
 env.set_top_left()
 print(env.left)
