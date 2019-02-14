@@ -25,6 +25,7 @@ mouse = Mouse()
 def get_mouse_location():
     x, y = mouse.position
     return [x,y] 
+
+def move_mouse(x,y):
+    mouse.move(x,y)
     
-
-

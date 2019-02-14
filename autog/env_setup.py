@@ -2,8 +2,9 @@ import numpy as np
 import cv2 
 from PIL import ImageGrab
 import time 
-from autog.control import get_mouse_location
+from autog.control import get_mouse_location, move_mouse
 from collections import deque, namedtuple
+import torch
 
 points = (0,0)
 
@@ -18,7 +19,6 @@ class Environment:
     mouse_control = False,
     keyboard_control = False, 
     max_memory = 10000):
-
         """ 
         Get the Environment ready for training 
 
@@ -74,18 +74,20 @@ class Environment:
             if ch & 0xff == ord('q'):
                 break
         cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
         self.right, self.bottom = points[0]*4, points[1]*4
 
 
     def start_recording(self, t = 100):
         while  len(self.state_memory) <= t:
-            screen = np.array(ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom)))
+            screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
+            screen = np.array(screen.resize((80,80)))
             self.state_memory.append(screen)
 
             if self.mouse_control:
                 mouse_location = get_mouse_location()
                 self.mouse_action_memory.append(mouse_location)
-
+            print(len(self.state_memory))
             if self.keyboard_control:
                 # Todo
                 NotImplementedError
@@ -98,12 +100,14 @@ class Environment:
         if self.keyboard_control:
             np.save(filename + "keyboard_action.npy", np.array(self.keyboard_action_memory))
 
+
     def load_memory(self, filename):
-        self.state_memory = np.load(file_name + "states.npy")
+        self.state_memory = np.load(filename + "states.npy")
         if self.mouse_control:
             self.mouse_action_memory = np.load(filename + "mouse_action.npy")
         if self.keyboard_control:
             self.keyboard_action_memory = np.load(filename + "keyboard_action.npy")
+
 
     def memory(self):
         """
@@ -124,6 +128,24 @@ class Environment:
             return states, m_actions, np.array([])
         elif self.keyboard_control:
             return states, np.array([]), k_actions
+
+    def play(self):
+        while True:
+            current_x, current_y = get_mouse_location()
+            screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
+            screen = np.array(screen.resize((80,80)))[:,:,:3]/255
+            screen = np.reshape(screen, [1,80,80,3])
+            screen = np.transpose(screen, (0, 3, 1, 2))
+            if self.mouse_control:
+                screen = torch.from_numpy(screen).float()
+                mouse = self.mouse_model.forward(screen)
+                mouse = (mouse*self.mouse_std) + self.mouse_mean
+                print(mouse)
+                move_mouse(mouse[0][0]-current_x, mouse[0][1]-current_y)
+
+            
+
+            
 
 
    
