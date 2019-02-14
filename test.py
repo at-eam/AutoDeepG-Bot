@@ -34,15 +34,17 @@ print(env.left)
 env.set_bottom_right()
 print(env.right)
 
-# env.start_recording(t=1000)
+# env.start_recording(t=2000)
 # env.save_memory("sliter")
 
 env.load_memory("sliter")
 
-x_states, y_mouse, y_keyboard = env.memory()
+x_states, y_mouse, _ = env.memory()
+
 print(x_states.shape, y_mouse.shape)
 print("Training")
-train_mouse(env, Net(), x_states, y_mouse, epochs=10)
+
+train_mouse(env, Net(), x_states, y_mouse, epochs=30)
 
 print("Play")
 env.play()

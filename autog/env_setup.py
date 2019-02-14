@@ -24,7 +24,10 @@ class Environment:
 
         Params:
         ======
-
+        mouse_control: Does env use mouse control 
+        keyboard_control: Does env use keyboard control 
+        max_memory: maximum data stored during recording 
+        
         """
         self.posible_actions = None
         self.top = None
@@ -45,7 +48,10 @@ class Environment:
         self.keyboard_control = keyboard_control
 
     def set_top_left(self):
-        """ Get the top left corner of screenshot """
+        """ 
+        Get the top left corner of screenshot 
+        Press q to contuniue
+        """
         global points
         cv2.namedWindow("frame")
         cv2.setMouseCallback("frame", click)
@@ -61,7 +67,10 @@ class Environment:
         self.left , self.top= points[0]*4, points[1]*4
 
     def set_bottom_right(self):
-        """ Get the bottom left corner of the screenshot """
+        """ 
+        Get the bottom left corner of the screenshot 
+        press q to contuniue
+        """
         global points
         cv2.namedWindow("frame")
         cv2.setMouseCallback("frame", click)
@@ -79,6 +88,15 @@ class Environment:
 
 
     def start_recording(self, t = 100):
+        """
+        Start creatating your dataset,
+        functions stores both state from the screen and 
+        actions from mouse and keyboard and saves them
+
+        Params:
+        =======
+        t: number of examples that will be stored 
+        """
         while  len(self.state_memory) <= t:
             screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
             screen = np.array(screen.resize((80,80)))
@@ -94,6 +112,9 @@ class Environment:
 
 
     def save_memory(self, filename):
+        """
+        saves the states and actions memory to filename path
+        """
         np.save(filename + "states.npy",np.array(self.state_memory))
         if self.mouse_control:
             np.save(filename + "mouse_action.npy", np.array(self.mouse_action_memory))
@@ -102,6 +123,9 @@ class Environment:
 
 
     def load_memory(self, filename):
+        """
+        loads memory from filename path
+        """
         self.state_memory = np.load(filename + "states.npy")
         if self.mouse_control:
             self.mouse_action_memory = np.load(filename + "mouse_action.npy")
@@ -130,6 +154,9 @@ class Environment:
             return states, np.array([]), k_actions
 
     def play(self):
+        """
+        Game bot starts playing itself
+        """
         while True:
             screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
             screen = np.array(screen.resize((80,80)))[:,:,:3]/255
