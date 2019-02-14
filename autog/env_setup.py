@@ -36,7 +36,6 @@ class Environment:
 class Mouse_Control_Env(Environment):
     def __init__(self, 
     mouse_control = False,
-    keyboard_control = False, 
     max_memory = 10000):
         """ 
         Get the Environment ready for training for
@@ -45,7 +44,6 @@ class Mouse_Control_Env(Environment):
         Params:
         ======
         mouse_control: Does env use mouse control 
-        keyboard_control: Does env use keyboard control 
         max_memory: maximum data stored during recording 
         
         """
@@ -55,17 +53,14 @@ class Mouse_Control_Env(Environment):
         self.right = None
         self.left = None
 
+        self.mouse_control = mouse_control
         self.state_memory = deque(maxlen = max_memory)
         self.mouse_action_memory = deque(maxlen = max_memory)
-        self.keyboard_action_memory = deque(maxlen = max_memory)
 
         self.mouse_model = None
-        self.keyboard_model = None
 
-        self.mouse_control = mouse_control
         self.mouse_std = None
         self.mouse_mean = None
-        self.keyboard_control = keyboard_control
 
     def set_top_left(self):
         """ 
@@ -77,6 +72,7 @@ class Mouse_Control_Env(Environment):
         cv2.setMouseCallback("frame", click)
         screen = np.array(ImageGrab.grab())
         screen = cv2.resize(screen, (0,0), fx=0.25, fy=0.25)
+        print("Please mark the top left corner and press 'q' ")
         while True:
             cv2.circle(screen, points, 3, (0,222,0), 5)
             cv2.imshow("frame", screen)
@@ -96,6 +92,7 @@ class Mouse_Control_Env(Environment):
         cv2.setMouseCallback("frame", click)
         screen = np.array(ImageGrab.grab())
         screen = cv2.resize(screen, (0,0), fx=0.25, fy=0.25)
+        print("Please mark the bottom left corner and press 'q' ")
         while True:
             cv2.circle(screen, points, 3, (0,222,0), 5)
             cv2.imshow("frame", screen)
@@ -111,7 +108,7 @@ class Mouse_Control_Env(Environment):
         """
         Start creatating your dataset,
         functions stores both state from the screen and 
-        actions from mouse and keyboard and saves them
+        actions from mouse and saves them
 
         Params:
         =======
@@ -122,13 +119,8 @@ class Mouse_Control_Env(Environment):
             screen = np.array(screen.resize((80,80)))
             self.state_memory.append(screen)
 
-            if self.mouse_control:
-                mouse_location = get_mouse_location()
-                self.mouse_action_memory.append(mouse_location)
-            print(len(self.state_memory))
-            if self.keyboard_control:
-                # Todo
-                NotImplementedError
+            mouse_location = get_mouse_location()
+            self.mouse_action_memory.append(mouse_location)
 
 
     def save_memory(self, filename):
@@ -136,10 +128,8 @@ class Mouse_Control_Env(Environment):
         saves the states and actions memory to filename path
         """
         np.save(filename + "states.npy",np.array(self.state_memory))
-        if self.mouse_control:
-            np.save(filename + "mouse_action.npy", np.array(self.mouse_action_memory))
-        if self.keyboard_control:
-            np.save(filename + "keyboard_action.npy", np.array(self.keyboard_action_memory))
+        np.save(filename + "mouse_action.npy", np.array(self.mouse_action_memory))
+        np.save(filename+"info.npy", np.array([self.posible_actions,self.top,self.bottom,self.right,self.left]))
 
 
     def load_memory(self, filename):
@@ -147,15 +137,18 @@ class Mouse_Control_Env(Environment):
         loads memory from filename path
         """
         self.state_memory = np.load(filename + "states.npy")
-        if self.mouse_control:
-            self.mouse_action_memory = np.load(filename + "mouse_action.npy")
-        if self.keyboard_control:
-            self.keyboard_action_memory = np.load(filename + "keyboard_action.npy")
+        self.mouse_action_memory = np.load(filename + "mouse_action.npy")
+        info = np.load(filename + "info.npy")
+        self.posible_actions = info[0]
+        self.top = info[1]
+        self.bottom = info[2]
+        self.right = info[3]
+        self.left = info[4]
 
 
     def memory(self):
         """
-        Returns truple: states , mouse_actions and keyboard actions 
+        Returns truple: states and mouse_actions 
         """
         states = np.array(self.state_memory)[:,:,:,:3]/255
 
@@ -164,14 +157,8 @@ class Mouse_Control_Env(Environment):
         self.mouse_mean = np.mean(m_actions)
         m_actions = (m_actions-self.mouse_mean)/self.mouse_std
 
-        k_actions = np.array(self.keyboard_action_memory)
-
-        if self.mouse_control and self.keyboard_control:
-            return states, m_actions, k_actions
-        elif self.mouse_control:
-            return states, m_actions, np.array([])
-        elif self.keyboard_control:
-            return states, np.array([]), k_actions
+        return states, m_actions
+        
 
     def play(self):
         """
@@ -188,4 +175,3 @@ class Mouse_Control_Env(Environment):
                 print(mouse)
                 move_mouse(mouse[0][0], mouse[0][1])
 
-            
