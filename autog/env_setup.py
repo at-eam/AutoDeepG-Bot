@@ -5,7 +5,6 @@ import time
 from autog.control import get_mouse_location
 from collections import deque, namedtuple
 
-
 points = (0,0)
 
 def click(event,x,y,flags,param):
@@ -37,7 +36,8 @@ class Environment:
         self.mouse_action_memory = deque(maxlen = max_memory)
         self.keyboard_action_memory = deque(maxlen = max_memory)
 
-        self.model = None
+        self.mouse_model = None
+        self.keyboard_model = None
 
         self.mouse_control = mouse_control
         self.mouse_std = None
@@ -110,7 +110,7 @@ class Environment:
         Returns truple: states , mouse_actions and keyboard actions 
         """
         states = np.array(self.state_memory)[:,:,:,:3]/255
-        
+
         m_actions = np.array(self.mouse_action_memory)
         self.mouse_std = np.std(m_actions)
         self.mouse_mean = np.mean(m_actions)
@@ -125,3 +125,5 @@ class Environment:
         elif self.keyboard_control:
             return states, np.array([]), k_actions
 
+
+   
