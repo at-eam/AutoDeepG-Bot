@@ -27,5 +27,7 @@ def get_mouse_location():
     return [x,y] 
 
 def move_mouse(x,y):
-    mouse.move(x,y)
+    mouse.position = (x,y)
+    
+
     

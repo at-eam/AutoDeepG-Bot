@@ -4,7 +4,7 @@ from PIL import ImageGrab
 import time 
 from autog.control import get_mouse_location, move_mouse
 from collections import deque, namedtuple
-import torch
+from autog.train_pytorch import play_mouse
 
 points = (0,0)
 
@@ -131,21 +131,14 @@ class Environment:
 
     def play(self):
         while True:
-            current_x, current_y = get_mouse_location()
             screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
             screen = np.array(screen.resize((80,80)))[:,:,:3]/255
             screen = np.reshape(screen, [1,80,80,3])
             screen = np.transpose(screen, (0, 3, 1, 2))
             if self.mouse_control:
-                screen = torch.from_numpy(screen).float()
-                mouse = self.mouse_model.forward(screen)
+                mouse = play_mouse(self.mouse_model, screen)
                 mouse = (mouse*self.mouse_std) + self.mouse_mean
                 print(mouse)
-                move_mouse(mouse[0][0]-current_x, mouse[0][1]-current_y)
+                move_mouse(mouse[0][0], mouse[0][1])
 
             
-
-            
-
-
-   

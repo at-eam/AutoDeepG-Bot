@@ -1,5 +1,5 @@
 from autog.env_setup import Environment
-from autog.train import train_mouse
+from autog.train_pytorch import train_mouse
 import cv2
 import torch
 import numpy as np 
@@ -42,7 +42,7 @@ env.load_memory("sliter")
 x_states, y_mouse, y_keyboard = env.memory()
 print(x_states.shape, y_mouse.shape)
 print("Training")
-train_mouse(env, Net(), x_states, y_mouse, epochs=20)
+train_mouse(env, Net(), x_states, y_mouse, epochs=10)
 
 print("Play")
 env.play()
