@@ -30,9 +30,7 @@ class Net(nn.Module):
 env = Mouse_Control_Env(mouse_control=True)
 
 env.set_top_left()
-print(env.left)
-env.set_bottom_right()
-print(env.right)
+env.set_bottom_right() 
 
 env.start_recording(t=200)
 env.save_memory("sliter")

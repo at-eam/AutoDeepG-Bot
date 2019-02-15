@@ -92,7 +92,7 @@ class Mouse_Control_Env(Environment):
         cv2.setMouseCallback("frame", click)
         screen = np.array(ImageGrab.grab())
         screen = cv2.resize(screen, (0,0), fx=0.25, fy=0.25)
-        print("Please mark the bottom left corner and press 'q' ")
+        print("Please mark the bottom right corner and press 'q' ")
         while True:
             cv2.circle(screen, points, 3, (0,222,0), 5)
             cv2.imshow("frame", screen)
