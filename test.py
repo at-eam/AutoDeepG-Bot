@@ -1,10 +1,12 @@
-from autog.env_setup import Mouse_Control_Env
+from autog.env_setup import Mouse_Control_Env, Keyboard_Control_Env
 from autog.train_pytorch import train_mouse
 import cv2
 import torch
 import numpy as np 
 from torch import nn, optim
 import torch.nn.functional as F
+
+# env = Keyboard_Control_Env(keyboard_control=True)
 
 class Net(nn.Module):
     def __init__(self):

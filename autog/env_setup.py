@@ -5,6 +5,9 @@ import time
 from autog.control import get_mouse_location, move_mouse
 from collections import deque, namedtuple
 from autog.train_pytorch import play_mouse
+from pynput import keyboard
+from pynput.keyboard import Key, Controller
+
 
 points = (0,0)
 
@@ -84,7 +87,7 @@ class Mouse_Control_Env(Environment):
 
     def set_bottom_right(self):
         """ 
-        Get the bottom left corner of the screenshot 
+        Get the bottom right corner of the screenshot 
         press q to contuniue
         """
         global points
@@ -92,7 +95,7 @@ class Mouse_Control_Env(Environment):
         cv2.setMouseCallback("frame", click)
         screen = np.array(ImageGrab.grab())
         screen = cv2.resize(screen, (0,0), fx=0.25, fy=0.25)
-        print("Please mark the bottom left corner and press 'q' ")
+        print("Please mark the bottom right corner and press 'q' ")
         while True:
             cv2.circle(screen, points, 3, (0,222,0), 5)
             cv2.imshow("frame", screen)
@@ -175,3 +178,65 @@ class Mouse_Control_Env(Environment):
                 print(mouse)
                 move_mouse(mouse[0][0], mouse[0][1])
 
+class KeyException(Exception): pass
+
+class Keyboard_Control_Env():
+
+    def __init__(self, keyboard_control = False, max_memory = 10000):
+        """ 
+        Get the Environment ready for training for
+        environments controled with keyboard
+
+        Params:
+        ======
+        keyboard_control: Does env use keyboard control 
+        max_memory: maximum data stored during recording 
+        
+        """
+        self.posible_actions = None
+        self.top = None
+        self.bottom = None
+        self.right = None
+        self.left = None
+
+        self.keyboard_control = keyboard_control
+        self.state_memory = deque(maxlen = max_memory)
+        self.keyboard_action_memory = deque(maxlen = max_memory)
+
+        self.keyboard_model = None
+
+        self.keyboard_std = None
+        self.keyboard_mean = None
+
+    def start_recording(self, t = 100):
+        """
+        Start creatating your dataset,
+        functions stores both state from the screen and 
+        actions from the keyboard and saves them
+
+        Params:
+        =======
+        t: number of examples that will be stored 
+        """
+
+        while len(self.state_memory) <= t:
+            screen = ImageGrab.grab(bbox=(self.left , self.top, self.right, self.bottom))
+            screen = np.array(screen.resize((80,80)))
+            self.state_memory.append(screen)
+
+            mouse_location = get_mouse_location()
+            self.mouse_action_memory.append(mouse_location)
+
+    def on_press(key):
+        print(key)
+        # interrupting the input from keyboard
+        if key == keyboard.Key.esc:
+            raise KeyException(key)
+
+    # Collect keyboard events until released
+    with keyboard.Listener(
+            on_press=on_press) as listener:
+        try:
+            listener.join()
+        except MyException as e:
+            print('{0} was pressed'.format(e.args[0]))
