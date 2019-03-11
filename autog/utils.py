@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from PIL import ImageGrab
 
 
 points = (0,0)
@@ -31,7 +32,7 @@ def set_top_left():
     cv2.destroyAllWindows()
     return points[0]*4, points[1]*4
 
-def set_bottom_right(self):
+def set_bottom_right():
     """ 
     Get the bottom right corner of the screenshot 
     press q to contuniue

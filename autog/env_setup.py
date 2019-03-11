@@ -134,7 +134,7 @@ class Mouse_Control_Env(Environment):
 
 class Keyboard_Control_Env():
 
-    def __init__(self, keyboard_control = False, max_memory = 10000):
+    def __init__(self,  max_memory = 10000):
         """ 
         Get the Environment ready for training for
         environments controled with keyboard
@@ -151,14 +151,17 @@ class Keyboard_Control_Env():
         self.right = None
         self.left = None
 
-        self.keyboard_control = keyboard_control
         self.state_memory = deque(maxlen = max_memory)
         self.keyboard_action_memory = deque(maxlen = max_memory)
 
         self.keyboard_model = None
-
+        # DID YOU FUCKING READ THE CODE :D 
         self.keyboard_std = None
         self.keyboard_mean = None
+
+    def set_screen(self):
+        self.left , self.top = set_top_left()
+        self.right, self.bottom = set_bottom_right()
 
     def start_recording(self, t = 100):
         """
@@ -176,19 +179,5 @@ class Keyboard_Control_Env():
             screen = np.array(screen.resize((80,80)))
             self.state_memory.append(screen)
 
-            mouse_location = get_mouse_location()
-            self.mouse_action_memory.append(mouse_location)
+            self.keyboard_action_memory = 
 
-    def on_press(key):
-        print(key)
-        # interrupting the input from keyboard
-        if key == keyboard.Key.esc:
-            raise KeyException(key)
-
-    # Collect keyboard events until released
-    with keyboard.Listener(
-            on_press=on_press) as listener:
-        try:
-            listener.join()
-        except MyException as e:
-            print('{0} was pressed'.format(e.args[0]))
