@@ -20,6 +20,9 @@ def
 from pynput.mouse import Button, Controller as Mouse
 from pynput.keyboard import Key, Controller as Keyboard
 
+from pynput import keyboard
+from pynput.keyboard import Key, Controller
+
 mouse = Mouse()
 
 def get_mouse_location():
